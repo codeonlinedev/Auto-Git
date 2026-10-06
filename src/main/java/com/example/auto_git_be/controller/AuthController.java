@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -27,11 +28,14 @@ public class AuthController {
         return ResponseEntity.ok(authService.getGoogleAuthUrl());
     }
 
-    @PostMapping("/google/callback")
-    public ResponseEntity<LoginResponse> handleGoogleCallbackPost(@RequestBody GoogleAuthCodeRequest request) {
-        LoginResponse response = authService.handleGoogleCallback(request.getCode(), request.getRole());
-        return ResponseEntity.ok(response);
-    }
+   @PostMapping("/google/callback")
+public ResponseEntity<LoginResponse> handleGoogleCallback(
+        @RequestBody Map<String, String> body) {
+    String code = body.get("code");
+    String role = body.getOrDefault("role", "STUDENT");
+    LoginResponse response = authService.handleGoogleCallback(code, role);
+    return ResponseEntity.ok(response);
+}
 
     @PostMapping("/otp/request")
     public ResponseEntity<OTPResponse> requestOTP(@RequestBody OTPLoginRequest request) {

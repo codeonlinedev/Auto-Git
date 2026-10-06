@@ -28,6 +28,7 @@ public class AssignmentService {
     private final TeacherAssignmentRepository teacherAssignmentRepository;
     private final CommentRepository commentRepository;
     private final GitHubService gitHubService;
+    private final R2CodeStorageService r2CodeStorageService;
     private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     private static final int CODE_LENGTH = 8;
     private static final SecureRandom random = new SecureRandom();
@@ -46,21 +47,21 @@ public class AssignmentService {
             String repoName = sanitizeRepoName(title + "-" + assignmentCode);
             String repoDescription = "Assignment: " + title + " for class " + classRoom.getName();
 
-            GHRepository ghRepo = gitHubService.createRepository(repoName, repoDescription);
+                      // Tạo folder trên R2 thay vì GitHub repo
+            r2CodeStorageService.createAssignmentFolder(assignmentCode, title);
+            r2CodeStorageService.createTaskFiles(assignmentCode, tasks);
 
-            gitHubService.createBranch(ghRepo.getFullName(), "teacher", ghRepo.getDefaultBranch());
-            gitHubService.deleteFileInRepo(ghRepo.getFullName(), "README.md", "teacher");
-            gitHubService.createMultipleFilesInRepo(ghRepo.getFullName(), "teacher", tasks);
 
+                        String r2FolderPath = "assignments/" + assignmentCode;
 
             Assignment assignment = Assignment.builder()
                     .classRoom(classRoom)
                     .title(title)
                     .description(description)
                     .assignmentCode(assignmentCode)
-                    .repoUrl(ghRepo.getHtmlUrl().toString())
-                    .repoName(ghRepo.getFullName())
-                    .githubRepoId(ghRepo.getId())
+                    .repoUrl("r2://" + r2FolderPath)          // Đánh dấu là R2
+                    .repoName(r2FolderPath)                    // Tên folder
+                    .githubRepoId(null)                        // Không dùng GitHub
                     .isActive(true)
                     .deadline(deadline)
                     .build();
@@ -179,10 +180,10 @@ public class AssignmentService {
 
             // External cleanup should not block DB cleanup.
             try {
-                gitHubService.deleteRepository(assignment.getRepoName());
-            } catch (Exception githubError) {
-                System.err.println("Failed to delete GitHub repository for assignment "
-                        + assignment.getAssignmentCode() + ": " + githubError.getMessage());
+                r2CodeStorageService.deleteAssignmentFolder(assignment.getAssignmentCode());
+            } catch (Exception r2Error) {
+                System.err.println("Failed to delete R2 folder for assignment "
+                        + assignment.getAssignmentCode() + ": " + r2Error.getMessage());
             }
 
         } catch (Exception e) {
@@ -195,9 +196,10 @@ public class AssignmentService {
             String assignmentCode, String localPath, User user) {
         try {
 
-            String githubToken = gitHubService.getToken();
+            String githubToken = r2CodeStorageService.getToken();
 
             Assignment assignment = getAssignmentByCode(assignmentCode);
+
             Student student = studentRepository.findByUserAndClassRoom(user, assignment.getClassRoom())
                     .orElseThrow(() -> new RuntimeException("You must join the class before joining assignments"));
 
@@ -218,8 +220,7 @@ public class AssignmentService {
             String sanitizedName = rawName.replaceAll("[^a-zA-Z0-9_-]", "_").toLowerCase();
             String branchName = "student-" + sanitizedName;
 
-            gitHubService.createBranch(assignment.getRepoName(), branchName, "teacher");
-
+            r2CodeStorageService.createStudentFolder(assignmentCode, student.getId());
             StudentAssignment studentAssignment = StudentAssignment.builder()
                     .student(student)
                     .assignment(assignment)

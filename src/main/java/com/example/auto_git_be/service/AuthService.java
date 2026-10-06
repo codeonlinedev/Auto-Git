@@ -75,22 +75,14 @@ public class AuthService {
                 user.setProfilePicture(picture);
 
                 String existingRole = user.getRole().toString();
-                if (!existingRole.equals(requestedRole)) {
-                    throw new RuntimeException("Email này đã được đăng ký với vai trò " + 
-                        (existingRole.equals("TEACHER") ? "Giáo viên" : "Sinh viên") + 
-                        ". Vui lòng sử dụng email khác để đăng ký vai trò khác.");
-                }
+                // Role check removed - allow login with existing role
                 userRepository.save(user);
             }
         }
         
         if (user != null) {
             String existingRole = user.getRole().toString();
-            if (!existingRole.equals(requestedRole)) {
-                throw new RuntimeException("Email này đã được đăng ký với vai trò " + 
-                    (existingRole.equals("TEACHER") ? "Giáo viên" : "Sinh viên") + 
-                    ". Vui lòng sử dụng email khác để đăng ký vai trò khác.");
-            }
+            // Role check removed - allow login with existing role
         } else {
             user = User.builder()
                     .email(email)
@@ -156,11 +148,7 @@ public class AuthService {
         
         if (user != null) {
             String existingRole = user.getRole().toString();
-            if (!existingRole.equals(requestedRole)) {
-                throw new RuntimeException("Email này đã được đăng ký với vai trò " + 
-                    (existingRole.equals("TEACHER") ? "Giáo viên" : "Sinh viên") + 
-                    ". Vui lòng sử dụng email khác để đăng ký vai trò khác.");
-            }
+            // Role check removed - allow login with existing role
         } else {
             user = User.builder()
                     .email(email)
@@ -187,4 +175,6 @@ public class AuthService {
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
     }
 }
+
+
 

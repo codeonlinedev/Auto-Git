@@ -31,6 +31,9 @@ public class SecurityConfig {
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/**").permitAll()
+		.requestMatchers("/api/assignments/**").permitAll()
+                .requestMatchers("/api/test/**").permitAll()
+		.requestMatchers("/login/oauth2/**").permitAll()
                 .requestMatchers("/api/health").permitAll()
                 .requestMatchers("/api/ai/test-vector-score").permitAll()
                 .requestMatchers("/api/test-cases/*/task/*/download").permitAll()

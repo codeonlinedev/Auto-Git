@@ -1,68 +1,29 @@
-HELP.md
-target/
-.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
-
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
-
-### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
-
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
-
-### VS Code ###
-.vscode/
-
-### Environment Variables ###
+# Environment variables (CHỨA CREDENTIALS)
 .env
-.env.*
-!.env.example
+run-backend.ps1
 
-### OS ###
+# Test files
+test.txt
+backend.log
+
+# Build output
+target/
+*.class
+*.log
+
+# IDE
+.idea/
+.vscode/settings.json
+*.iml
+
+# OS
 .DS_Store
 Thumbs.db
+# Credentials - KHÔNG ĐẨY LÊN GIT
+.env
+run-backend.ps1
+*.env
 
-### Logs ###
-*.log
-*.log.*
-
-### Database ###
-*.db
-*.sqlite
-*.sqlite3
-
-### Temporary files ###
-*.tmp
-*.temp
-*.swp
-*~
-
-### Maven ###
-mvnw
-mvnw.cmd
-.mvn/
-
-### Application specific ###
-# Không ignore các file migration SQL
-!src/main/resources/db/migration/*.sql
-
-/local_cache/
+# Test files
+test.txt
+backend.log

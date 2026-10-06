@@ -7,6 +7,8 @@ services:
       POSTGRES_USER: ${DB_USERNAME:-postgres}
       POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
       POSTGRES_DB: ${DB_NAME:-mydb}
+      TZ: Asia/Ho_Chi_Minh
+      PGTZ: Asia/Ho_Chi_Minh
     ports:
       - "5432:5432"
     volumes:
@@ -32,18 +34,19 @@ services:
       retries: 5
 
   minio:
-    image: minio/minio:latest
+    image: quay.io/minio/aistor/minio:RELEASE.2026-09-19T17-05-25Z
     container_name: minio
     restart: unless-stopped
-    command: server /data --console-address ":9001"
+    command: server /data --console-address ":9001" --license /minio.license
     environment:
       MINIO_ROOT_USER: ${MINIO_ACCESS_KEY:-minioadmin}
       MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY:-minioadmin}
     ports:
-      - "9000:9000"   # S3 API
-      - "9001:9001"   # Web console
+      - "9000:9000"
+      - "9001:9001"
     volumes:
       - minio_data:/data
+      - ./minio.license:/minio.license:ro
     healthcheck:
       test: ["CMD", "mc", "ready", "local"]
       interval: 10s
@@ -55,8 +58,8 @@ services:
     container_name: qdrant
     restart: unless-stopped
     ports:
-      - "6333:6333"   # HTTP API
-      - "6334:6334"   # gRPC
+      - "6333:6333"
+      - "6334:6334"
     volumes:
       - qdrant_data:/qdrant/storage
     healthcheck:
