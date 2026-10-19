@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test WebSocket STOMP</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+</head>
+<body>
+    <h2>Test Nhận Thông Báo Realtime</h2>
+    <div id="messages" style="border: 1px solid #ccc; padding: 10px; min-height: 200px;">
+        Đang chờ tin nhắn...<br>
+    </div>
+
+    <script>
+        // 1. Cấu hình URL backend của bạn (thay cổng 8080 nếu cần)
+        var socket = new SockJS('http://localhost:8080/ws-notifications');
+        var stompClient = Stomp.over(socket);
+
+        // 2. Lấy một JWT Token THẬT của một Giáo viên (hoặc Sinh viên) paste vào đây
+        var jwtToken = "Bearer eyJhbGciOiJIUzUxMiJ9.eyJ1c2VySWQiOjEsInN1YiI6ImNoaWVubGdlbmQyNDAzMjAwNEBnbWFpbC5jb20iLCJpYXQiOjE3NzQzMjUyNzQsImV4cCI6MTc3NDQxMTY3NH0.kyrmGhRp2fGLDNH30o0W5t7NzYXQDYjsmcWNqziynasLv9iGlq_FUiTY3qyWieR82La0eeivRhWCvXJSW19mqw"; 
+
+        // 3. Kết nối với header chứa token
+        stompClient.connect({'Authorization': jwtToken}, function (frame) {
+            console.log('Đã kết nối thành công: ' + frame);
+            
+            // 4. Lắng nghe (Subscribe) kênh thông báo cá nhân
+            // LƯU Ý QUAN TRỌNG: Phía client chỉ cần subscribe vào "/user/queue/notifications"
+            // Spring Boot sẽ tự động map nó tới user tương ứng với JWT Token
+            stompClient.subscribe('/user/queue/notifications', function (message) {
+                var notification = JSON.parse(message.body);
+                console.log("CÓ THÔNG BÁO MỚI: ", notification);
+                
+                // Hiển thị ra màn hình
+                var messagesDiv = document.getElementById('messages');
+                messagesDiv.innerHTML += `<p style="color: blue;">[${notification.type}] ${notification.message}</p>`;
+            });
+            
+        }, function(error) {
+            console.error("Lỗi kết nối WebSocket: ", error);
+        });
+    </script>
+</body>
+</html>

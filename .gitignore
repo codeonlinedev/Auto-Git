@@ -1,33 +1,31 @@
-	# Environment variables (CHỨA CREDENTIALS)
+# ===== Environment variables =====
 .env
 run-backend.ps1
 
-# Test files
-test.txt
-backend.log
-
-# Build output
+# ===== Build output =====
 target/
 *.class
 *.log
+backend.log
 
-# IDE
+# ===== IDE =====
 .idea/
 .vscode/settings.json
 *.iml
 
-# OS
+# ===== OS =====
 .DS_Store
 Thumbs.db
-# MinIO license
+
+# ===== MinIO license =====
 minio.license
 
-# Test controller (không cần production)
-<<<<<<< HEAD
-TestR2Controller.java
-=======
-TestR2Controller.java
-local_cache/
-*.json
+# ===== Test files (local only) =====
+test.txt
+test.json
+test-*.json
 diem.xlsx
->>>>>>> 4773ba4 (Update CloudflareJudgeService va các DTO)
+local_cache/
+
+# ===== Test controller =====
+TestR2Controller.java

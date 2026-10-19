@@ -1,0 +1,1220 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auto Git Classroom</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--vscode-editor-background);
+            color: var(--vscode-foreground);
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        /* Login Page Styles */
+        .login-page {
+            display: block;
+        }
+
+        .login-page.hidden {
+            display: none;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-header h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+            color: var(--vscode-foreground);
+        }
+
+        .login-header p {
+            font-size: 14px;
+            color: var(--vscode-descriptionForeground);
+        }
+
+        .login-card {
+            background: var(--vscode-editor-background);
+            border: 1px solid var(--vscode-widget-border);
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--vscode-foreground);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--vscode-input-border);
+            background: var(--vscode-input-background);
+            color: var(--vscode-input-foreground);
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--vscode-focusBorder);
+        }
+
+        .form-group input::placeholder {
+            color: var(--vscode-input-placeholderForeground);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            background: var(--vscode-button-background);
+            color: var(--vscode-button-foreground);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: var(--vscode-button-hoverBackground);
+        }
+
+        .btn-google {
+            background: white;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+
+        .btn-google:hover:not(:disabled) {
+            background: #f8f8f8;
+        }
+
+        .google-icon {
+            width: 18px;
+            height: 18px;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 24px 0;
+            color: var(--vscode-descriptionForeground);
+            font-size: 13px;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid var(--vscode-widget-border);
+        }
+
+        .divider span {
+            padding: 0 12px;
+        }
+
+        .otp-section {
+            display: none;
+        }
+
+        .otp-section.active {
+            display: block;
+        }
+
+        .otp-info {
+            background: var(--vscode-textBlockQuote-background);
+            border-left: 3px solid var(--vscode-button-background);
+            padding: 12px;
+            margin-bottom: 16px;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+        .status-message {
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            display: none;
+        }
+
+        .status-message.active {
+            display: block;
+        }
+
+        .status-message.success {
+            background: rgba(76, 175, 80, 0.1);
+            border: 1px solid rgba(76, 175, 80, 0.3);
+            color: #4caf50;
+        }
+
+        .status-message.error {
+            background: rgba(244, 67, 54, 0.1);
+            border: 1px solid rgba(244, 67, 54, 0.3);
+            color: #f44336;
+        }
+
+        .status-message.info {
+            background: rgba(33, 150, 243, 0.1);
+            border: 1px solid rgba(33, 150, 243, 0.3);
+            color: #2196f3;
+        }
+
+        /* Main App Styles */
+        .main-app {
+            display: none;
+        }
+
+        .main-app.active {
+            display: block;
+        }
+
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            background: var(--vscode-editor-background);
+            border: 1px solid var(--vscode-widget-border);
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--vscode-button-background);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--vscode-button-foreground);
+            font-weight: 600;
+        }
+
+        .btn-logout {
+            padding: 8px 16px;
+            background: transparent;
+            color: var(--vscode-foreground);
+            border: 1px solid var(--vscode-widget-border);
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .btn-logout:hover {
+            background: var(--vscode-list-hoverBackground);
+        }
+
+        .role-selector {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .role-btn {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid var(--vscode-widget-border);
+            background: var(--vscode-editor-background);
+            color: var(--vscode-foreground);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .role-btn.active {
+            background: var(--vscode-button-background);
+            color: var(--vscode-button-foreground);
+            border-color: var(--vscode-button-background);
+        }
+
+        .form-section {
+            background: var(--vscode-editor-background);
+            border: 1px solid var(--vscode-widget-border);
+            border-radius: 8px;
+            padding: 20px;
+            display: none;
+        }
+
+        .form-section.active {
+            display: block;
+        }
+
+        .form-section h2 {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        .result-box {
+            background: var(--vscode-textBlockQuote-background);
+            border: 1px solid var(--vscode-widget-border);
+            border-radius: 6px;
+            padding: 16px;
+            margin-top: 16px;
+            display: none;
+        }
+
+        .result-box.active {
+            display: block;
+        }
+
+        .result-box div {
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        .result-box strong {
+            color: var(--vscode-foreground);
+            display: inline-block;
+            min-width: 120px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Login Page -->
+        <div id="loginPage" class="login-page">
+            <div class="login-header">
+                <h1>🎓 Auto Git Classroom</h1>
+                <p>Đăng nhập để tiếp tục</p>
+            </div>
+
+            <div class="login-card">
+                <div id="statusMessage" class="status-message"></div>
+
+                <!-- Email + OTP Login -->
+                <div id="emailLoginSection">
+                    <div class="form-group">
+                        <label for="loginEmail">Email</label>
+                        <input 
+                            type="email" 
+                            id="loginEmail" 
+                            placeholder="example@gmail.com"
+                            autocomplete="email"
+                        >
+                    </div>
+
+                    <div id="otpSection" class="otp-section">
+                        <div class="otp-info">
+                            📧 Mã OTP đã được gửi đến email của bạn. Vui lòng kiểm tra hộp thư.
+                        </div>
+                        <div class="form-group">
+                            <label for="otpCode">Mã OTP (6 số)</label>
+                            <input 
+                                type="text" 
+                                id="otpCode" 
+                                placeholder="123456"
+                                maxlength="6"
+                                pattern="[0-9]{6}"
+                                autocomplete="one-time-code"
+                            >
+                        </div>
+                    </div>
+
+                    <button id="emailLoginBtn" class="btn btn-primary">
+                        Gửi mã OTP
+                    </button>
+                </div>
+
+                <div class="divider">
+                    <span>Hoặc đăng nhập bằng</span>
+                </div>
+
+                <!-- Google Login -->
+                <button id="googleLoginBtn" class="btn btn-google">
+                    <svg class="google-icon" viewBox="0 0 24 24">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                    </svg>
+                    Đăng nhập bằng Google
+                </button>
+            </div>
+        </div>
+
+        <!-- Main App -->
+        <div id="mainApp" class="main-app">
+            <div class="app-header">
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar">U</div>
+                    <div>
+                        <div id="userName" style="font-weight: 500; font-size: 14px;"></div>
+                        <div id="userEmail" style="font-size: 12px; color: var(--vscode-descriptionForeground);"></div>
+                    </div>
+                </div>
+                <button id="logoutBtn" class="btn-logout">Đăng xuất</button>
+            </div>
+
+            <div id="statusMessageMain" class="status-message"></div>
+
+            <div class="role-selector">
+                <button id="teacherRoleBtn" class="role-btn active">👨‍🏫 Teacher</button>
+                <button id="studentRoleBtn" class="role-btn">👨‍🎓 Student</button>
+            </div>
+
+            <!-- Teacher Form -->
+            <div id="teacherForm" class="form-section active">
+                <h2>Teacher Dashboard</h2>
+                <div class="form-group">
+                    <label for="className">Tên lớp học</label>
+                    <input type="text" id="className" placeholder="VD: OOP-2024">
+                </div>
+                <button id="createClassBtn" class="btn btn-primary">
+                    Tạo Repository + Class Code
+                </button>
+
+                <div id="teacherResult" class="result-box">
+                    <div><strong>Repository URL:</strong> <span id="repoUrl"></span></div>
+                    <div><strong>Class Code:</strong> <span id="classCode"></span></div>
+                </div>
+            </div>
+
+            <!-- Student Form -->
+            <div id="studentForm" class="form-section">
+                <h2>Student Dashboard</h2>
+                <div class="form-group">
+                    <label for="studentName">Tên sinh viên</label>
+                    <input type="text" id="studentName" placeholder="VD: Nguyễn Văn A">
+                </div>
+                <div class="form-group">
+                    <label for="classCodeInput">Class Code</label>
+                    <input type="text" id="classCodeInput" placeholder="Nhập mã lớp từ giáo viên">
+                </div>
+                <button id="joinClassBtn" class="btn btn-primary">
+                    Tham gia lớp học
+                </button>
+
+                <div id="studentResult" class="result-box">
+                    <div><strong>Repository URL:</strong> <span id="studentRepoUrl"></span></div>
+                    <div><strong>Branch:</strong> <span id="studentBranch"></span></div>
+                    <div><strong>Status:</strong> <span id="cloneStatus">Chưa clone</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const vscode = acquireVsCodeApi();
+
+        // State
+        let isLoggedIn = false;
+        let userData = null;
+        let currentRole = 'teacher';
+        let isOTPSent = false;
+
+        // Login Page Elements
+        const loginPage = document.getElementById('loginPage');
+        const mainApp = document.getElementById('mainApp');
+        const loginEmail = document.getElementById('loginEmail');
+        const otpCode = document.getElementById('otpCode');
+        const otpSection = document.getElementById('otpSection');
+        const emailLoginBtn = document.getElementById('emailLoginBtn');
+        const googleLoginBtn = document.getElementById('googleLoginBtn');
+        const statusMessage = document.getElementById('statusMessage');
+
+        // Main App Elements
+        const statusMessageMain = document.getElementById('statusMessageMain');
+        const userAvatar = document.getElementById('userAvatar');
+        const userName = document.getElementById('userName');
+        const userEmail = document.getElementById('userEmail');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const teacherRoleBtn = document.getElementById('teacherRoleBtn');
+        const studentRoleBtn = document.getElementById('studentRoleBtn');
+        const teacherForm = document.getElementById('teacherForm');
+        const studentForm = document.getElementById('studentForm');
+        const createClassBtn = document.getElementById('createClassBtn');
+        const joinClassBtn = document.getElementById('joinClassBtn');
+
+        // Utility Functions
+        function showStatus(message, type = 'info', isMainApp = false) {
+            const statusEl = isMainApp ? statusMessageMain : statusMessage;
+            statusEl.textContent = message;
+            statusEl.className = `status-message active ${type}`;
+            setTimeout(() => {
+                statusEl.className = 'status-message';
+            }, 5000);
+        }
+
+        function showLoginPage() {
+            loginPage.classList.remove('hidden');
+            mainApp.classList.remove('active');
+        }
+
+        function showMainApp() {
+            loginPage.classList.add('hidden');
+            mainApp.classList.add('active');
+        }
+
+        // Email + OTP Login
+        emailLoginBtn.addEventListener('click', () => {
+            if (!isOTPSent) {
+                // Step 1: Request OTP
+                const email = loginEmail.value.trim();
+                if (!email || !email.includes('@')) {
+                    showStatus('Vui lòng nhập email hợp lệ', 'error');
+                    return;
+                }
+
+                showStatus('Đang gửi mã OTP...', 'info');
+                emailLoginBtn.disabled = true;
+
+                vscode.postMessage({
+                    command: 'requestOTP',
+                    email: email
+                });
+            } else {
+                // Step 2: Verify OTP
+                const email = loginEmail.value.trim();
+                const otp = otpCode.value.trim();
+
+                if (!otp || otp.length !== 6 || !/^\d{6}$/.test(otp)) {
+                    showStatus('Vui lòng nhập mã OTP 6 số', 'error');
+                    return;
+                }
+
+                showStatus('Đang xác thực...', 'info');
+                emailLoginBtn.disabled = true;
+
+                vscode.postMessage({
+                    command: 'verifyOTP',
+                    email: email,
+                    otp: otp
+                });
+            }
+        });
+
+        // Google Login
+        googleLoginBtn.addEventListener('click', () => {
+            showStatus('Đang mở trình duyệt...', 'info');
+            vscode.postMessage({
+                command: 'googleLogin'
+            });
+        });
+
+        // Logout
+        logoutBtn.addEventListener('click', () => {
+            vscode.postMessage({ command: 'logout' });
+            isLoggedIn = false;
+            userData = null;
+            isOTPSent = false;
+            otpSection.classList.remove('active');
+            emailLoginBtn.textContent = 'Gửi mã OTP';
+            emailLoginBtn.disabled = false;
+            loginEmail.value = '';
+            loginEmail.disabled = false;
+            otpCode.value = '';
+            showLoginPage();
+        });
+
+        // Role Switching
+        teacherRoleBtn.addEventListener('click', () => {
+            currentRole = 'teacher';
+            teacherRoleBtn.classList.add('active');
+            studentRoleBtn.classList.remove('active');
+            teacherForm.classList.add('active');
+            studentForm.classList.remove('active');
+        });
+
+        studentRoleBtn.addEventListener('click', () => {
+            currentRole = 'student';
+            studentRoleBtn.classList.add('active');
+            teacherRoleBtn.classList.remove('active');
+            studentForm.classList.add('active');
+            teacherForm.classList.remove('active');
+        });
+
+        // Create Class (Teacher)
+        createClassBtn.addEventListener('click', () => {
+            const className = document.getElementById('className').value.trim();
+            if (!className) {
+                showStatus('Vui lòng nhập tên lớp học', 'error', true);
+                return;
+            }
+
+            showStatus('Đang tạo lớp học...', 'info', true);
+            vscode.postMessage({
+                command: 'createClass',
+                className: className
+            });
+        });
+
+        // Join Class (Student)
+        joinClassBtn.addEventListener('click', () => {
+            const studentName = document.getElementById('studentName').value.trim();
+            const classCode = document.getElementById('classCodeInput').value.trim();
+
+            if (!studentName || !classCode) {
+                showStatus('Vui lòng nhập đầy đủ thông tin', 'error', true);
+                return;
+            }
+
+            showStatus('Đang tham gia lớp học...', 'info', true);
+            vscode.postMessage({
+                command: 'joinClass',
+                studentName: studentName,
+                classCode: classCode
+            });
+        });
+
+        // Handle Messages from Extension
+        window.addEventListener('message', event => {
+            const message = event.data;
+
+            switch (message.command) {
+                case 'otpRequested':
+                    isOTPSent = true;
+                    otpSection.classList.add('active');
+                    emailLoginBtn.textContent = 'Xác nhận đăng nhập';
+                    emailLoginBtn.disabled = false;
+                    loginEmail.disabled = true;
+                    otpCode.focus();
+                    showStatus(message.message || 'Mã OTP đã được gửi', 'success');
+                    break;
+
+                case 'otpRequestError':
+                    emailLoginBtn.disabled = false;
+                    showStatus('Lỗi: ' + (message.error || 'Không thể gửi OTP'), 'error');
+                    break;
+
+                case 'otpVerifyError':
+                    emailLoginBtn.disabled = false;
+                    otpCode.value = '';
+                    otpCode.focus();
+                    showStatus('Mã OTP không đúng hoặc đã hết hạn', 'error');
+                    break;
+
+                case 'loginSuccess':
+                    isLoggedIn = true;
+                    userData = message.data;
+                    
+                    // Update UI
+                    userName.textContent = userData.name || userData.email;
+                    userEmail.textContent = userData.email;
+                    userAvatar.textContent = (userData.name || userData.email).charAt(0).toUpperCase();
+                    
+                    // Reset login form
+                    isOTPSent = false;
+                    otpSection.classList.remove('active');
+                    emailLoginBtn.textContent = 'Gửi mã OTP';
+                    emailLoginBtn.disabled = false;
+                    loginEmail.value = '';
+                    loginEmail.disabled = false;
+                    otpCode.value = '';
+                    
+                    showMainApp();
+                    showStatus('Đăng nhập thành công!', 'success', true);
+                    break;
+
+                case 'loginError':
+                    emailLoginBtn.disabled = false;
+                    showStatus('Lỗi đăng nhập: ' + message.error, 'error');
+                    break;
+
+                case 'createClassSuccess':
+                    document.getElementById('repoUrl').textContent = message.data.repoUrl;
+                    document.getElementById('classCode').textContent = message.data.classCode;
+                    document.getElementById('teacherResult').classList.add('active');
+                    showStatus('Tạo lớp học thành công!', 'success', true);
+                    break;
+
+                case 'createClassError':
+                    showStatus('Lỗi: ' + message.error, 'error', true);
+                    break;
+
+                case 'joinClassSuccess':
+                    document.getElementById('studentRepoUrl').textContent = message.data.repoUrl;
+                    document.getElementById('studentBranch').textContent = message.data.branch;
+                    document.getElementById('cloneStatus').textContent = 'Đang clone...';
+                    document.getElementById('studentResult').classList.add('active');
+                    showStatus('Tham gia lớp học thành công!', 'success', true);
+                    break;
+
+                case 'cloneComplete':
+                    document.getElementById('cloneStatus').textContent = 'Hoàn thành';
+                    showStatus('Clone repository thành công!', 'success', true);
+                    break;
+
+                case 'joinClassError':
+                    showStatus('Lỗi: ' + message.error, 'error', true);
+                    break;
+            }
+        });
+
+        // Request initial state
+        vscode.postMessage({ command: 'getState' });
+    </script>
+</body>
+</html>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--vscode-font-family);
+            color: var(--vscode-foreground);
+            background-color: var(--vscode-editor-background);
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: var(--vscode-foreground);
+        }
+
+        h2 {
+            font-size: 18px;
+            margin: 20px 0 10px 0;
+            color: var(--vscode-foreground);
+        }
+
+        .role-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .role-btn {
+            flex: 1;
+            padding: 10px;
+            background-color: var(--vscode-button-secondaryBackground);
+            color: var(--vscode-button-secondaryForeground);
+            border: 1px solid var(--vscode-button-border);
+            cursor: pointer;
+            border-radius: 2px;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+
+        .role-btn:hover {
+            background-color: var(--vscode-button-secondaryHoverBackground);
+        }
+
+        .role-btn.active {
+            background-color: var(--vscode-button-background);
+            color: var(--vscode-button-foreground);
+        }
+
+        .auth-section {
+            padding: 20px;
+            background-color: var(--vscode-editor-inactiveSelectionBackground);
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+
+        .form-section {
+            display: none;
+            padding: 20px;
+            background-color: var(--vscode-editor-inactiveSelectionBackground);
+            border-radius: 4px;
+        }
+
+        .form-section.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 13px;
+            color: var(--vscode-foreground);
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            background-color: var(--vscode-input-background);
+            color: var(--vscode-input-foreground);
+            border: 1px solid var(--vscode-input-border);
+            border-radius: 2px;
+            font-size: 13px;
+        }
+
+        input:focus {
+            outline: 1px solid var(--vscode-focusBorder);
+        }
+
+        button {
+            padding: 8px 16px;
+            background-color: var(--vscode-button-background);
+            color: var(--vscode-button-foreground);
+            border: none;
+            cursor: pointer;
+            border-radius: 2px;
+            font-size: 13px;
+            margin-right: 10px;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: var(--vscode-button-hoverBackground);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .google-btn {
+            background-color: #4285f4;
+            color: white;
+            width: 100%;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .google-btn:hover {
+            background-color: #357ae8;
+        }
+
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 2px;
+            font-size: 13px;
+            display: none;
+        }
+
+        .status.success {
+            background-color: var(--vscode-terminal-ansiGreen);
+            color: var(--vscode-editor-background);
+            display: block;
+        }
+
+        .status.error {
+            background-color: var(--vscode-terminal-ansiRed);
+            color: white;
+            display: block;
+        }
+
+        .status.info {
+            background-color: var(--vscode-terminal-ansiBlue);
+            color: white;
+            display: block;
+        }
+
+        .user-info {
+            display: none;
+            padding: 10px;
+            background-color: var(--vscode-editor-selectionBackground);
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        .user-info.active {
+            display: block;
+        }
+
+        .result-box {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: var(--vscode-editor-background);
+            border: 1px solid var(--vscode-input-border);
+            border-radius: 2px;
+            font-family: monospace;
+            font-size: 12px;
+            display: none;
+        }
+
+        .result-box.active {
+            display: block;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎓 Auto Git Classroom</h1>
+        
+        <div class="role-selector">
+            <button class="role-btn active" id="teacherRoleBtn">👨‍🏫 Teacher</button>
+            <button class="role-btn" id="studentRoleBtn">👨‍🎓 Student</button>
+        </div>
+
+        <div class="auth-section">
+            <div id="loginSection">
+                <button class="google-btn" id="googleLoginBtn">
+                    <svg width="18" height="18" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><path d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/><path d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/></g></svg>
+                    Đăng nhập bằng Google
+                </button>
+                
+                <div style="margin: 15px 0; text-align: center; color: #888;">hoặc</div>
+                
+                <!-- OTP Login Form -->
+                <div id="otpLoginForm">
+                    <div class="form-group">
+                        <label for="otpEmail">Email:</label>
+                        <input type="email" id="otpEmail" placeholder="example@gmail.com">
+                    </div>
+                    <button id="requestOtpBtn">Gửi mã OTP</button>
+                    
+                    <div id="otpVerifySection" style="display: none; margin-top: 15px;">
+                        <div class="form-group">
+                            <label for="otpCode">Mã OTP (6 số):</label>
+                            <input type="text" id="otpCode" placeholder="123456" maxlength="6" pattern="[0-9]{6}">
+                        </div>
+                        <button id="verifyOtpBtn">Xác nhận OTP</button>
+                        <div style="margin-top: 10px; font-size: 12px; color: #666;">
+                            📧 Mã OTP đã được gửi đến email của bạn. Vui lòng kiểm tra hộp thư.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="userInfo" class="user-info">
+                <div><strong>Đã đăng nhập:</strong> <span id="userEmail"></span></div>
+                <button id="logoutBtn" style="margin-top: 10px;">Đăng xuất</button>
+            </div>
+        </div>
+
+        <div id="statusMessage" class="status"></div>
+
+        <!-- Teacher Form -->
+        <div id="teacherForm" class="form-section active">
+            <h2>Teacher Dashboard</h2>
+            <div class="form-group">
+                <label for="className">Tên lớp học:</label>
+                <input type="text" id="className" placeholder="Nhập tên lớp học (VD: OOP-2024)">
+            </div>
+            <button id="createRepoBtn" disabled>Tạo Repository + Class Code</button>
+            
+            <div id="teacherResult" class="result-box">
+                <div><strong>Repository URL:</strong> <span id="repoUrl"></span></div>
+                <div><strong>Class Code:</strong> <span id="classCode"></span></div>
+            </div>
+        </div>
+
+        <!-- Student Form -->
+        <div id="studentForm" class="form-section">
+            <h2>Student Dashboard</h2>
+            <div class="form-group">
+                <label for="studentName">Tên sinh viên:</label>
+                <input type="text" id="studentName" placeholder="Nhập tên của bạn">
+            </div>
+            <div class="form-group">
+                <label for="classCodeInput">Class Code:</label>
+                <input type="text" id="classCodeInput" placeholder="Nhập mã lớp học">
+            </div>
+            <button id="joinClassBtn" disabled>Tham gia lớp học</button>
+            
+            <div id="studentResult" class="result-box">
+                <div><strong>Repository:</strong> <span id="studentRepoUrl"></span></div>
+                <div><strong>Branch của bạn:</strong> <span id="studentBranch"></span></div>
+                <div><strong>Trạng thái:</strong> <span id="cloneStatus">Đang clone...</span></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const vscode = acquireVsCodeApi();
+        
+        let currentRole = 'teacher';
+        let isLoggedIn = false;
+        let userData = null;
+
+        // DOM Elements
+        const teacherRoleBtn = document.getElementById('teacherRoleBtn');
+        const studentRoleBtn = document.getElementById('studentRoleBtn');
+        const googleLoginBtn = document.getElementById('googleLoginBtn');
+        const requestOtpBtn = document.getElementById('requestOtpBtn');
+        const verifyOtpBtn = document.getElementById('verifyOtpBtn');
+        const otpEmail = document.getElementById('otpEmail');
+        const otpCode = document.getElementById('otpCode');
+        const otpVerifySection = document.getElementById('otpVerifySection');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const loginSection = document.getElementById('loginSection');
+        const userInfo = document.getElementById('userInfo');
+        const userEmail = document.getElementById('userEmail');
+        const statusMessage = document.getElementById('statusMessage');
+        
+        const teacherForm = document.getElementById('teacherForm');
+        const studentForm = document.getElementById('studentForm');
+        const createRepoBtn = document.getElementById('createRepoBtn');
+        const joinClassBtn = document.getElementById('joinClassBtn');
+
+        // Role switching
+        teacherRoleBtn.addEventListener('click', () => {
+            currentRole = 'teacher';
+            teacherRoleBtn.classList.add('active');
+            studentRoleBtn.classList.remove('active');
+            teacherForm.classList.add('active');
+            studentForm.classList.remove('active');
+            updateButtonStates();
+        });
+
+        studentRoleBtn.addEventListener('click', () => {
+            currentRole = 'student';
+            studentRoleBtn.classList.add('active');
+            teacherRoleBtn.classList.remove('active');
+            studentForm.classList.add('active');
+            teacherForm.classList.remove('active');
+            updateButtonStates();
+        });
+
+        // Google Login
+        googleLoginBtn.addEventListener('click', () => {
+            showStatus('Đang mở trình duyệt để đăng nhập...', 'info');
+            vscode.postMessage({
+                command: 'googleLogin'
+            });
+        });
+        
+        // OTP Login - Request OTP
+        requestOtpBtn.addEventListener('click', () => {
+            const email = otpEmail.value.trim();
+            if (!email || !email.includes('@')) {
+                showStatus('Vui lòng nhập email hợp lệ', 'error');
+                return;
+            }
+            
+            showStatus('Đang gửi mã OTP...', 'info');
+            requestOtpBtn.disabled = true;
+            
+            vscode.postMessage({
+                command: 'requestOTP',
+                email: email
+            });
+        });
+        
+        // OTP Login - Verify OTP
+        verifyOtpBtn.addEventListener('click', () => {
+            const email = otpEmail.value.trim();
+            const otp = otpCode.value.trim();
+            
+            if (!otp || otp.length !== 6 || !/^\d{6}$/.test(otp)) {
+                showStatus('Vui lòng nhập mã OTP 6 số', 'error');
+                return;
+            }
+            
+            showStatus('Đang xác thực OTP...', 'info');
+            verifyOtpBtn.disabled = true;
+            
+            vscode.postMessage({
+                command: 'verifyOTP',
+                email: email,
+                otp: otp
+            });
+        });
+
+        // Logout
+        logoutBtn.addEventListener('click', () => {
+            vscode.postMessage({
+                command: 'logout'
+            });
+            isLoggedIn = false;
+            userData = null;
+            loginSection.classList.remove('hidden');
+            userInfo.classList.remove('active');
+            updateButtonStates();
+            showStatus('Đã đăng xuất', 'info');
+        });
+
+        // Create Repository (Teacher)
+        createRepoBtn.addEventListener('click', () => {
+            const className = document.getElementById('className').value.trim();
+            if (!className) {
+                showStatus('Vui lòng nhập tên lớp học', 'error');
+                return;
+            }
+
+            showStatus('Đang tạo repository và class code...', 'info');
+            vscode.postMessage({
+                command: 'createClass',
+                className: className
+            });
+        });
+
+        // Join Class (Student)
+        joinClassBtn.addEventListener('click', () => {
+            const studentName = document.getElementById('studentName').value.trim();
+            const classCode = document.getElementById('classCodeInput').value.trim();
+            
+            if (!studentName || !classCode) {
+                showStatus('Vui lòng nhập đầy đủ thông tin', 'error');
+                return;
+            }
+
+            showStatus('Đang tham gia lớp học...', 'info');
+            vscode.postMessage({
+                command: 'joinClass',
+                studentName: studentName,
+                classCode: classCode
+            });
+        });
+
+        // Handle messages from extension
+        window.addEventListener('message', event => {
+            const message = event.data;
+            
+            switch (message.command) {
+                case 'otpRequested':
+                    showStatus(message.message || 'Mã OTP đã được gửi. Kiểm tra console logs.', 'success');
+                    otpVerifySection.style.display = 'block';
+                    requestOtpBtn.disabled = true;
+                    otpEmail.disabled = true;
+                    otpCode.focus();
+                    break;
+                    
+                case 'otpRequestError':
+                    showStatus('Lỗi gửi OTP: ' + (message.error || 'Unknown error'), 'error');
+                    requestOtpBtn.disabled = false;
+                    break;
+                    
+                case 'otpVerifyError':
+                    showStatus('Mã OTP không đúng hoặc đã hết hạn', 'error');
+                    verifyOtpBtn.disabled = false;
+                    otpCode.value = '';
+                    otpCode.focus();
+                    break;
+                
+                case 'loginSuccess':
+                    isLoggedIn = true;
+                    userData = message.data;
+                    userEmail.textContent = userData.email || userData.name;
+                    loginSection.classList.add('hidden');
+                    userInfo.classList.add('active');
+                    updateButtonStates();
+                    showStatus('Đăng nhập thành công!', 'success');
+                    // Reset OTP form
+                    otpEmail.value = '';
+                    otpCode.value = '';
+                    otpVerifySection.style.display = 'none';
+                    requestOtpBtn.disabled = false;
+                    verifyOtpBtn.disabled = false;
+                    otpEmail.disabled = false;
+                    break;
+                
+                case 'loginError':
+                    showStatus('Lỗi đăng nhập: ' + message.error, 'error');
+                    break;
+                
+                case 'createClassSuccess':
+                    document.getElementById('repoUrl').textContent = message.data.repoUrl;
+                    document.getElementById('classCode').textContent = message.data.classCode;
+                    document.getElementById('teacherResult').classList.add('active');
+                    showStatus('Tạo lớp học thành công!', 'success');
+                    break;
+                
+                case 'createClassError':
+                    showStatus('Lỗi tạo lớp: ' + message.error, 'error');
+                    break;
+                
+                case 'joinClassSuccess':
+                    document.getElementById('studentRepoUrl').textContent = message.data.repoUrl;
+                    document.getElementById('studentBranch').textContent = message.data.branch;
+                    document.getElementById('cloneStatus').textContent = 'Đang clone repository...';
+                    document.getElementById('studentResult').classList.add('active');
+                    showStatus('Tham gia lớp học thành công!', 'success');
+                    break;
+                
+                case 'cloneComplete':
+                    document.getElementById('cloneStatus').textContent = 'Clone hoàn tất! Auto-push đã được kích hoạt.';
+                    showStatus('Repository đã sẵn sàng. Mọi thay đổi sẽ tự động push khi bạn lưu file.', 'success');
+                    break;
+                
+                case 'joinClassError':
+                    showStatus('Lỗi tham gia lớp: ' + message.error, 'error');
+                    break;
+                
+                case 'pushSuccess':
+                    showStatus('Đã tự động push thay đổi lên GitHub', 'success');
+                    setTimeout(() => statusMessage.classList.remove('success', 'error', 'info'), 3000);
+                    break;
+                
+                case 'pushError':
+                    showStatus('Lỗi push: ' + message.error, 'error');
+                    break;
+            }
+        });
+
+        function updateButtonStates() {
+            createRepoBtn.disabled = !isLoggedIn;
+            joinClassBtn.disabled = !isLoggedIn;
+        }
+
+        function showStatus(message, type) {
+            statusMessage.textContent = message;
+            statusMessage.className = 'status ' + type;
+            
+            if (type === 'success' || type === 'info') {
+                setTimeout(() => {
+                    statusMessage.classList.remove('success', 'error', 'info');
+                }, 5000);
+            }
+        }
+
+        // Initialize
+        updateButtonStates();
+        
+        // Request initial state from extension
+        vscode.postMessage({ command: 'getState' });
+    </script>
+</body>
+</html>

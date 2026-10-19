@@ -1,0 +1,137 @@
+{
+  "name": "auto-git",
+  "displayName": "Auto Git Classroom",
+  "description": "Auto git classroom management with Google login and auto-push",
+  "version": "0.0.1",
+  "publisher": "yourname",
+  "engines": {
+    "vscode": "^1.106.1"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onView:autoGitClassroom",
+    "onCommand:auto-git.createCodeCommentFromSelection",
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "auto-git.openClassroom",
+        "title": "Auto Git: Open Classroom"
+      },
+      {
+        "command": "auto-git.logout",
+        "title": "Auto Git: Logout"
+      },
+      {
+        "command": "auto-git.createCodeCommentFromSelection",
+        "title": "Auto Git: Comment Selected Code"
+      },
+      {
+        "command": "auto-git.inspectGlobalState",
+        "title": "Auto Git: Inspect Global State"
+      },
+      {
+        "command": "codingrooms.runCode",
+        "title": "Run Code",
+        "icon": "$(play)"
+      },
+      {
+        "command": "codingrooms.submitCode",
+        "title": "Submit",
+        "icon": "$(cloud-upload)"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "auto-git.createCodeCommentFromSelection",
+          "when": "editorHasSelection",
+          "group": "navigation@99"
+        }
+      ],
+      "editor/title": [
+        {
+          "command": "codingrooms.runCode",
+          "group": "navigation@1",
+          "when": "resourceLangId == java || resourceLangId == python || resourceLangId == cpp"
+        },
+        {
+          "command": "codingrooms.submitCode",
+          "group": "navigation@2",
+          "when": "resourceLangId == java || resourceLangId == python || resourceLangId == cpp"
+        }
+      ]
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "autoGitClassroom",
+          "title": "Auto Git Classroom",
+          "icon": "resources/icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "autoGitClassroom": [
+        {
+          "type": "webview",
+          "id": "autoGitClassroom.mainView",
+          "name": "Classroom Manager"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile && npm run build:webview",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "build:webview": "webpack --config webpack.webview.config.js",
+    "watch:webview": "webpack --config webpack.webview.config.js --watch",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src",
+    "test": "vscode-test"
+  },
+  "dependencies": {
+    "@stomp/stompjs": "^7.2.1",
+    "@types/sockjs-client": "^1.5.4",
+    "axios": "^1.6.0",
+    "katex": "^0.16.45",
+    "lucide-react": "^0.556.0",
+    "react": "^19.2.1",
+    "react-dom": "^19.2.1",
+    "react-markdown": "^10.1.0",
+    "react-syntax-highlighter": "^16.1.1",
+    "rehype-katex": "^7.0.1",
+    "remark-gfm": "^4.0.1",
+    "remark-math": "^6.0.0",
+    "simple-git": "^3.25.0",
+    "sockjs-client": "^1.6.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.18",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "22.x",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "@types/vscode": "^1.106.1",
+    "@vscode/test-cli": "^0.0.12",
+    "@vscode/test-electron": "^2.5.2",
+    "autoprefixer": "^10.4.23",
+    "css-loader": "^7.1.2",
+    "eslint": "^9.39.1",
+    "html-webpack-plugin": "^5.6.5",
+    "postcss": "^8.5.6",
+    "postcss-loader": "^8.2.0",
+    "style-loader": "^4.0.0",
+    "tailwindcss": "^4.1.18",
+    "ts-loader": "^9.5.4",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.46.3",
+    "webpack": "^5.103.0",
+    "webpack-cli": "^6.0.1"
+  }
+}

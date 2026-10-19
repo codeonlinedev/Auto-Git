@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auto Submit</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #ffffff;
+            color: #000000;
+        }
+
+        #root {
+            background-color: #ffffff;
+            min-height: 100vh;
+        }
+
+        /* Modern color system with professional gradient */
+        :root {
+            --color-primary: #2563eb;
+            --color-primary-light: #dbeafe;
+            --color-primary-dark: #1e40af;
+            --color-accent: #06b6d4;
+            --color-success: #10b981;
+            --color-warning: #f59e0b;
+            --color-error: #ef4444;
+            
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --bg-tertiary: #e2e8f0;
+            
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-tertiary: #94a3b8;
+            
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #f0f9ff 0%, #f0fdf4 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* Enhanced login page with modern design */
+        .login-page {
+            display: block;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .login-page.hidden {
+            display: none;
+            animation: fadeOut 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 0;
+            }
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .login-logo {
+            font-size: 48px;
+            margin-bottom: 16px;
+            display: block;
+        }
+
+        .login-header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+            letter-spacing: -0.5px;
+        }
+
+        .login-header p {
+            font-size: 15px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .login-card {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: var(--shadow-lg);
+            backdrop-filter: blur(10px);
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            letter-spacing: 0.3px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1.5px solid var(--border-color);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            border-radius: 10px;
+            font-size: 15px;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.2s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            background: var(--bg-primary);
+        }
+
+        .form-group input::placeholder {
+            color: var(--text-tertiary);
+        }
+
+        /* Improved button styling */
+        .btn {
+            width: 100%;
+            padding: 13px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            letter-spacing: 0.3px;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4);
+        }
+
+        .btn-primary:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .btn-google {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            border: 1.5px solid var(--border-color);
+            margin-top: 8px;
+        }
+
+        .btn-google:hover:not(:disabled) {
+            background: var(--bg-secondary);
+            border-color: var(--color-primary);
+            box-shadow: var(--shadow-md);
+        }
+
+        .google-icon {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+        }
+
+        /* Enhanced divider */
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 28px 0;
+            color: var(--text-tertiary);
+            font-size: 13px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .divider span {
+            padding: 0 16px;
+        }
+
+        .otp-section {
+            display: none;
+            margin-top: 20px;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        .otp-section.active {
+            display: block;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Modern info box */
+        .otp-info {
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.05) 0%, rgba(6, 182, 212, 0.05) 100%);
+            border-left: 4px solid var(--color-primary);
+            padding: 14px 16px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+
+        /* Improved status messages */
+        .status-message {
+            padding: 14px 16px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: none;
+            border: 1px solid;
+            font-weight: 500;
+        }
+
+        .status-message.active {
+            display: block;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        .status-message.success {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: rgba(16, 185, 129, 0.3);
+            color: #047857;
+        }
+
+        .status-message.error {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.3);
+            color: #991b1b;
+        }
+
+        .status-message.info {
+            background: rgba(37, 99, 235, 0.1);
+            border-color: rgba(37, 99, 235, 0.3);
+            color: #1e40af;
+        }
+
+        /* Redesigned main app layout */
+        .main-app {
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .main-app.active {
+            display: block;
+        }
+
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        /* Modern avatar design */
+        .user-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 18px;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .user-details h3 {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .user-details p {
+            font-size: 13px;
+            color: var(--text-tertiary);
+        }
+
+        /* Enhanced logout button */
+        .btn-logout {
+            padding: 10px 18px;
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1.5px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .btn-logout:hover {
+            background: var(--bg-secondary);
+            border-color: var(--color-error);
+            color: var(--color-error);
+        }
+
+        /* Modern role selector */
+        .role-selector {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            background: var(--bg-secondary);
+            padding: 6px;
+            border-radius: 12px;
+        }
+
+        .role-btn {
+            flex: 1;
+            padding: 12px 16px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .role-btn:hover {
+            background: rgba(37, 99, 235, 0.05);
+        }
+
+        .role-btn.active {
+            background: var(--bg-primary);
+            color: var(--color-primary);
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.15);
+        }
+
+        /* Modern form section */
+        .form-section {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 28px;
+            display: none;
+            box-shadow: var(--shadow-md);
+        }
+
+        .form-section.active {
+            display: block;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        .form-section h2 {
+            font-size: 20px;
+            margin-bottom: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.3px;
+        }
+
+        /* Improved result box */
+        .result-box {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, #f1f5f9 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 18px;
+            margin-top: 20px;
+            display: none;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .result-box.active {
+            display: block;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        .result-box div {
+            margin-bottom: 12px;
+            font-size: 13px;
+            line-height: 1.6;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .result-box div:last-child {
+            margin-bottom: 0;
+        }
+
+        .result-box strong {
+            color: var(--text-primary);
+            font-weight: 600;
+            min-width: 140px;
+            flex-shrink: 0;
+        }
+
+        .result-box span {
+            color: var(--text-secondary);
+            word-break: break-all;
+            font-weight: 400;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Login Page -->
+        <div id="loginPage" class="login-page">
+            <div class="login-header">
+                <span class="login-logo">🎓</span>
+                <h1>Auto Git Classroom</h1>
+                <p>Quản lý lớp học GitHub một cách dễ dàng</p>
+            </div>
+
+            <div class="login-card">
+                <div id="statusMessage" class="status-message"></div>
+
+                <!-- Email + OTP Login -->
+                <div id="emailLoginSection">
+                    <div class="form-group">
+                        <label for="loginEmail">Email</label>
+                        <input 
+                            type="email" 
+                            id="loginEmail" 
+                            placeholder="example@gmail.com"
+                            autocomplete="email"
+                        >
+                    </div>
+
+                    <div id="otpSection" class="otp-section">
+                        <div class="otp-info">
+                            📧 Mã OTP đã được gửi đến email của bạn
+                        </div>
+                        <div class="form-group">
+                            <label for="otpCode">Mã OTP</label>
+                            <input 
+                                type="text" 
+                                id="otpCode" 
+                                placeholder="Nhập 6 chữ số"
+                                maxlength="6"
+                                pattern="[0-9]{6}"
+                                autocomplete="one-time-code"
+                            >
+                        </div>
+                    </div>
+
+                    <button id="emailLoginBtn" class="btn btn-primary">
+                        Gửi mã OTP
+                    </button>
+                </div>
+
+                <div class="divider">
+                    <span>Hoặc</span>
+                </div>
+
+                <!-- Google Login -->
+                <button id="googleLoginBtn" class="btn btn-google">
+                    <svg class="google-icon" viewBox="0 0 24 24">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                    </svg>
+                    Đăng nhập bằng Google
+                </button>
+            </div>
+        </div>
+
+        <!-- Main App -->
+        <div id="mainApp" class="main-app">
+            <div class="app-header">
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar">U</div>
+                    <div class="user-details">
+                        <h3 id="userName">User</h3>
+                        <p id="userEmail">email@example.com</p>
+                    </div>
+                </div>
+                <button id="logoutBtn" class="btn-logout">Đăng xuất</button>
+            </div>
+
+            <div id="statusMessageMain" class="status-message"></div>
+
+            <div class="role-selector">
+                <button id="teacherRoleBtn" class="role-btn active">👨‍🏫 Teacher</button>
+                <button id="studentRoleBtn" class="role-btn">👨‍🎓 Student</button>
+            </div>
+
+            <!-- Teacher Form -->
+            <div id="teacherForm" class="form-section active">
+                <h2>Tạo Lớp Học</h2>
+                <div class="form-group">
+                    <label for="className">Tên lớp học</label>
+                    <input type="text" id="className" placeholder="VD: OOP-2024">
+                </div>
+                <button id="createClassBtn" class="btn btn-primary">
+                    🚀 Tạo Repository + Class Code
+                </button>
+
+                <div id="teacherResult" class="result-box">
+                    <div><strong>Repository:</strong> <span id="repoUrl"></span></div>
+                    <div><strong>Class Code:</strong> <span id="classCode"></span></div>
+                </div>
+            </div>
+
+            <!-- Student Form -->
+            <div id="studentForm" class="form-section">
+                <h2>Tham Gia Lớp Học</h2>
+                <div class="form-group">
+                    <label for="studentName">Tên sinh viên</label>
+                    <input type="text" id="studentName" placeholder="VD: Nguyễn Văn A">
+                </div>
+                <div class="form-group">
+                    <label for="classCodeInput">Class Code</label>
+                    <input type="text" id="classCodeInput" placeholder="Nhập mã lớp từ giáo viên">
+                </div>
+                <button id="joinClassBtn" class="btn btn-primary">
+                    ✓ Tham gia lớp học
+                </button>
+
+                <div id="studentResult" class="result-box">
+                    <div><strong>Repository:</strong> <span id="studentRepoUrl"></span></div>
+                    <div><strong>Branch:</strong> <span id="studentBranch"></span></div>
+                    <div><strong>Status:</strong> <span id="cloneStatus">Chưa clone</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const vscode = acquireVsCodeApi();
+
+        // State
+        let isLoggedIn = false;
+        let userData = null;
+        let currentRole = 'teacher';
+        let isOTPSent = false;
+
+        // Login Page Elements
+        const loginPage = document.getElementById('loginPage');
+        const mainApp = document.getElementById('mainApp');
+        const loginEmail = document.getElementById('loginEmail');
+        const otpCode = document.getElementById('otpCode');
+        const otpSection = document.getElementById('otpSection');
+        const emailLoginBtn = document.getElementById('emailLoginBtn');
+        const googleLoginBtn = document.getElementById('googleLoginBtn');
+        const statusMessage = document.getElementById('statusMessage');
+
+        // Main App Elements
+        const statusMessageMain = document.getElementById('statusMessageMain');
+        const userAvatar = document.getElementById('userAvatar');
+        const userName = document.getElementById('userName');
+        const userEmail = document.getElementById('userEmail');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const teacherRoleBtn = document.getElementById('teacherRoleBtn');
+        const studentRoleBtn = document.getElementById('studentRoleBtn');
+        const teacherForm = document.getElementById('teacherForm');
+        const studentForm = document.getElementById('studentForm');
+        const createClassBtn = document.getElementById('createClassBtn');
+        const joinClassBtn = document.getElementById('joinClassBtn');
+
+        // Utility Functions
+        function showStatus(message, type = 'info', isMainApp = false) {
+            const statusEl = isMainApp ? statusMessageMain : statusMessage;
+            statusEl.textContent = message;
+            statusEl.className = `status-message active ${type}`;
+            setTimeout(() => {
+                statusEl.className = 'status-message';
+            }, 5000);
+        }
+
+        function showLoginPage() {
+            loginPage.classList.remove('hidden');
+            mainApp.classList.remove('active');
+        }
+
+        function showMainApp() {
+            loginPage.classList.add('hidden');
+            mainApp.classList.add('active');
+        }
+
+        // Email + OTP Login
+        emailLoginBtn.addEventListener('click', () => {
+            if (!isOTPSent) {
+                // Step 1: Request OTP
+                const email = loginEmail.value.trim();
+                if (!email || !email.includes('@')) {
+                    showStatus('Vui lòng nhập email hợp lệ', 'error');
+                    return;
+                }
+
+                showStatus('Đang gửi mã OTP...', 'info');
+                emailLoginBtn.disabled = true;
+
+                vscode.postMessage({
+                    command: 'requestOTP',
+                    email: email
+                });
+            } else {
+                // Step 2: Verify OTP
+                const email = loginEmail.value.trim();
+                const otp = otpCode.value.trim();
+
+                if (!otp || otp.length !== 6 || !/^\d{6}$/.test(otp)) {
+                    showStatus('Vui lòng nhập mã OTP 6 số', 'error');
+                    return;
+                }
+
+                showStatus('Đang xác thực...', 'info');
+                emailLoginBtn.disabled = true;
+
+                vscode.postMessage({
+                    command: 'verifyOTP',
+                    email: email,
+                    otp: otp
+                });
+            }
+        });
+
+        // Google Login
+        googleLoginBtn.addEventListener('click', () => {
+            showStatus('Đang mở trình duyệt...', 'info');
+            vscode.postMessage({
+                command: 'googleLogin'
+            });
+        });
+
+        // Logout
+        logoutBtn.addEventListener('click', () => {
+            vscode.postMessage({ command: 'logout' });
+            isLoggedIn = false;
+            userData = null;
+            isOTPSent = false;
+            otpSection.classList.remove('active');
+            emailLoginBtn.textContent = 'Gửi mã OTP';
+            emailLoginBtn.disabled = false;
+            loginEmail.value = '';
+            loginEmail.disabled = false;
+            otpCode.value = '';
+            showLoginPage();
+        });
+
+        // Role Switching
+        teacherRoleBtn.addEventListener('click', () => {
+            currentRole = 'teacher';
+            teacherRoleBtn.classList.add('active');
+            studentRoleBtn.classList.remove('active');
+            teacherForm.classList.add('active');
+            studentForm.classList.remove('active');
+        });
+
+        studentRoleBtn.addEventListener('click', () => {
+            currentRole = 'student';
+            studentRoleBtn.classList.add('active');
+            teacherRoleBtn.classList.remove('active');
+            studentForm.classList.add('active');
+            teacherForm.classList.remove('active');
+        });
+
+        // Create Class (Teacher)
+        createClassBtn.addEventListener('click', () => {
+            const className = document.getElementById('className').value.trim();
+            if (!className) {
+                showStatus('Vui lòng nhập tên lớp học', 'error', true);
+                return;
+            }
+
+            showStatus('Đang tạo lớp học...', 'info', true);
+            createClassBtn.disabled = true; // Disable button while processing
+
+            vscode.postMessage({
+                command: 'createClass',
+                className: className
+            });
+        });
+
+        // Join Class (Student)
+        joinClassBtn.addEventListener('click', () => {
+            const studentName = document.getElementById('studentName').value.trim();
+            const classCode = document.getElementById('classCodeInput').value.trim();
+
+            if (!studentName || !classCode) {
+                showStatus('Vui lòng nhập đầy đủ thông tin', 'error', true);
+                return;
+            }
+
+            showStatus('Đang tham gia lớp học...', 'info', true);
+            joinClassBtn.disabled = true; // Disable button while processing
+
+            vscode.postMessage({
+                command: 'joinClass',
+                studentName: studentName,
+                classCode: classCode
+            });
+        });
+
+        // Handle Messages from Extension
+        window.addEventListener('message', event => {
+            const message = event.data;
+
+            switch (message.command) {
+                case 'otpRequested':
+                    isOTPSent = true;
+                    otpSection.classList.add('active');
+                    emailLoginBtn.textContent = 'Xác nhận đăng nhập'; // Changed from 'Gửi mã OTP'
+                    emailLoginBtn.disabled = false;
+                    loginEmail.disabled = true; // Disable email input after OTP is sent
+                    otpCode.focus();
+                    showStatus(message.message || 'Mã OTP đã được gửi', 'success');
+                    break;
+
+                case 'otpRequestError':
+                    emailLoginBtn.disabled = false;
+                    showStatus('Lỗi: ' + (message.error || 'Không thể gửi OTP'), 'error');
+                    break;
+
+                case 'otpVerifyError':
+                    emailLoginBtn.disabled = false;
+                    otpCode.value = '';
+                    otpCode.focus();
+                    showStatus('Mã OTP không đúng hoặc đã hết hạn', 'error');
+                    break;
+
+                case 'loginSuccess':
+                    isLoggedIn = true;
+                    userData = message.data;
+                    
+                    // Update UI
+                    userName.textContent = userData.name || userData.email;
+                    userEmail.textContent = userData.email;
+                    userAvatar.textContent = (userData.name || userData.email).charAt(0).toUpperCase();
+                    
+                    // Reset login form
+                    isOTPSent = false;
+                    otpSection.classList.remove('active');
+                    emailLoginBtn.textContent = 'Gửi mã OTP';
+                    emailLoginBtn.disabled = false;
+                    loginEmail.value = '';
+                    loginEmail.disabled = false;
+                    otpCode.value = '';
+                    
+                    showMainApp();
+                    showStatus('Đăng nhập thành công!', 'success', true);
+                    break;
+
+                case 'loginError':
+                    emailLoginBtn.disabled = false;
+                    showStatus('Lỗi đăng nhập: ' + message.error, 'error');
+                    break;
+
+                case 'createClassSuccess':
+                    document.getElementById('repoUrl').textContent = message.data.repoUrl;
+                    document.getElementById('classCode').textContent = message.data.classCode;
+                    document.getElementById('teacherResult').classList.add('active');
+                    showStatus('Tạo lớp học thành công!', 'success', true);
+                    createClassBtn.disabled = false; // Re-enable button
+                    break;
+
+                case 'createClassError':
+                    showStatus('Lỗi: ' + message.error, 'error', true);
+                    createClassBtn.disabled = false; // Re-enable button
+                    break;
+
+                case 'joinClassSuccess':
+                    document.getElementById('studentRepoUrl').textContent = message.data.repoUrl;
+                    document.getElementById('studentBranch').textContent = message.data.branch;
+                    document.getElementById('cloneStatus').textContent = 'Đang clone...'; // Initial status
+                    document.getElementById('studentResult').classList.add('active');
+                    showStatus('Tham gia lớp học thành công!', 'success', true);
+                    // The actual clone status will be updated by another message like 'cloneComplete'
+                    break;
+
+                case 'cloneComplete':
+                    document.getElementById('cloneStatus').textContent = 'Hoàn thành';
+                    showStatus('Clone repository thành công!', 'success', true);
+                    joinClassBtn.disabled = false; // Re-enable button
+                    break;
+
+                case 'joinClassError':
+                    showStatus('Lỗi: ' + message.error, 'error', true);
+                    joinClassBtn.disabled = false; // Re-enable button
+                    break;
+            }
+        });
+
+        // Request initial state on load
+        // This part was missing in the original script, assuming it's needed for persistence
+        vscode.postMessage({ command: 'getState' });
+    </script>
+</body>
+</html>
