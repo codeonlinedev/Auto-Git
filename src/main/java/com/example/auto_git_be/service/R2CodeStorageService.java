@@ -142,4 +142,33 @@ public class R2CodeStorageService {
     public String getToken() {
         return "";
     }
+	    /**
+     * Copy task files từ teacher folder sang student folder
+     * Tương đương createBranch() của GitHub - branch mới có sẵn file từ branch teacher
+     */
+    public void copyTeacherFilesToStudent(String code, Long studentId) {
+        List<String> teacherFiles = listTeacherFiles(code);
+        
+        log.info("Copying {} teacher files to student {}", teacherFiles.size(), studentId);
+        
+        for (String teacherKey : teacherFiles) {
+            if (teacherKey.endsWith("/.keep")) continue;
+            
+            try {
+                // Download nội dung file từ teacher folder
+                byte[] content = r2StorageService.downloadFile(teacherKey);
+                
+                // Lấy tên file (task1.cpp, task2.cpp...)
+                String fileName = teacherKey.substring(teacherKey.lastIndexOf('/') + 1);
+                
+                // Upload sang student folder
+                String studentKey = "assignments/" + code + "/students/" + studentId + "/" + fileName;
+                r2StorageService.uploadFile(studentKey, content, "text/x-c++src");
+                
+                log.info("Copied {} -> {}", teacherKey, studentKey);
+            } catch (Exception e) {
+                log.warn("Failed to copy {}: {}", teacherKey, e.getMessage());
+            }
+        }
+    }
 }

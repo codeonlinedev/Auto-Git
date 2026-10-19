@@ -143,7 +143,10 @@ public class AssignmentService {
         return assignmentRepository.findByAssignmentCode(assignmentCode)
                 .orElseThrow(() -> new RuntimeException("Assignment not found"));
     }
-
+    public Assignment getAssignmentById(Long id) {
+    return assignmentRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Assignment not found: " + id));
+}
     public List<Assignment> getAssignmentsByClassroom(ClassRoom classRoom) {
         return assignmentRepository.findByClassRoomAndIsActive(classRoom, true);
     }
@@ -221,7 +224,8 @@ public class AssignmentService {
             String branchName = "student-" + sanitizedName;
 
             r2CodeStorageService.createStudentFolder(assignmentCode, student.getId());
-            StudentAssignment studentAssignment = StudentAssignment.builder()
+	    r2CodeStorageService.copyTeacherFilesToStudent(assignmentCode, student.getId());
+                        StudentAssignment studentAssignment = StudentAssignment.builder()
                     .student(student)
                     .assignment(assignment)
                     .branchName(branchName)
@@ -229,7 +233,23 @@ public class AssignmentService {
                     .commitCount(0)
                     .build();
 
-            studentAssignmentRepository.save(studentAssignment);
+            try {
+                studentAssignmentRepository.save(studentAssignment);
+            } catch (org.springframework.dao.DataIntegrityViolationException dupEx) {
+                // Race condition: request khác đã insert trước → lấy bản ghi cũ
+                StudentAssignment existing = studentAssignmentRepository
+                        .findByStudentAndAssignment(student, assignment)
+                        .orElseThrow(() -> dupEx);
+
+                return JoinAssignmentResponse.builder()
+                        .repoUrl(assignment.getRepoUrl())
+                        .branch(existing.getBranchName())
+                        .token(githubToken)
+                        .studentId(student.getId().toString())
+                        .assignmentTitle(assignment.getTitle())
+                        .deadline(assignment.getDeadline())
+                        .build();
+            }
 
             return JoinAssignmentResponse.builder()
                     .repoUrl(assignment.getRepoUrl())

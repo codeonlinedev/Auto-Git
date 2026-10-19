@@ -29,13 +29,34 @@ public class JudgeController {
     private final StudentRepository studentRepository;
     private final AssignmentRepository assignmentRepository;
 
-    @PostMapping("/run")
-    public ResponseEntity<ExecuteResponse> runCode(
-            @RequestBody ExecuteRequest request) {
+   @PostMapping("/run")
+public ResponseEntity<ExecuteResponse> runCode(
+        @RequestBody ExecuteRequest request,
+        @RequestHeader("Authorization") String authHeader) {
+    String token = authHeader.substring(7);
+    User user = authService.getUserFromToken(token);
 
-        ExecuteResponse response = judgeService.runTests(request);
-        return ResponseEntity.ok(response);
+    // Check user có quyền với assignment không
+    Assignment assignment = assignmentRepository
+            .findByAssignmentCode(request.getAssignmentCode())
+            .orElseThrow(() -> new EntityNotFoundException("Assignment not found"));
+
+    ClassRoom classRoom = assignment.getClassRoom();
+    boolean hasAccess = false;
+
+    if (user.getRole() == User.UserRole.TEACHER) {
+        hasAccess = classRoom.getTeacher().getId().equals(user.getId());
+    } else if (user.getRole() == User.UserRole.STUDENT) {
+        hasAccess = studentRepository.findByUserAndClassRoom(user, classRoom).isPresent();
     }
+
+    if (!hasAccess) {
+        return ResponseEntity.status(403).build();
+    }
+
+    ExecuteResponse response = judgeService.runTests(request);
+    return ResponseEntity.ok(response);
+}
 
     @PostMapping("/submit")
     public ResponseEntity<SubmitResponse> submitCode(

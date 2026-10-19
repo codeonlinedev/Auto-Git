@@ -314,12 +314,46 @@ public class AssignmentController {
         return ResponseEntity.ok(submissions);
     }
 
-    @GetMapping("/export-excel/{assignmentId}")
-    public void exportStudentPointExcel(HttpServletResponse response,
-                                        @PathVariable Long assignmentId
-    ) throws IOException {
-        excelService.exportStudentPoint(response, assignmentId);
+  @GetMapping("/export-excel/{assignmentId}")
+public void exportStudentPointExcel(
+        HttpServletResponse response,
+        @PathVariable Long assignmentId,
+        @RequestHeader(value = "Authorization", required = false) String authHeader
+) throws IOException {
+
+    // 1. Validate auth header
+    if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        return;
     }
+
+    String token = authHeader.substring(7);
+    User user;
+    try {
+        user = authService.getUserFromToken(token);
+    } catch (Exception e) {
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        return;
+    }
+
+    // 2. Lấy assignment
+    Assignment assignment;
+    try {
+        assignment = assignmentService.getAssignmentById(assignmentId);
+    } catch (RuntimeException e) {
+        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        return;
+    }
+
+    // 3. Check quyền: chỉ teacher sở hữu lớp mới được export
+    if (!assignment.getClassRoom().getTeacher().getId().equals(user.getId())) {
+        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+        return;
+    }
+
+    // 4. Export
+    excelService.exportStudentPoint(response, assignmentId);
+}
 
     @PostMapping("/comments")
     public ResponseEntity<?> createComment(

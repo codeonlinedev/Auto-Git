@@ -23,4 +23,11 @@ Thumbs.db
 minio.license
 
 # Test controller (không cần production)
+<<<<<<< HEAD
 TestR2Controller.java
+=======
+TestR2Controller.java
+local_cache/
+*.json
+diem.xlsx
+>>>>>>> 4773ba4 (Update CloudflareJudgeService va các DTO)
